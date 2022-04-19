@@ -1,0 +1,22 @@
+{
+  "data": [
+    {
+      "id": "asd-123",
+      "name": "jana",
+      "email": "jana-test@gmail.com",
+      "ticket": {
+        "status": true,
+        "number": 1580,
+        "title": "Começando com Nodejs",
+        "date": 1650228934000,
+        "address": "Online"
+      }
+    },
+    {
+      "id": "fgh-567",
+      "name": "jana",
+      "email": "jana-test@jana.com",
+      "ticket": {}
+    }
+  ]
+}

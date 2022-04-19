@@ -1,0 +1,45 @@
+service: send-ticket-by-email
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: dev
+  region: us-east-1
+  environment: ${file(./config.${opt:stage, 'dev'}.yml)}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - sqs:*
+      Resource:
+        Fn::GetAtt: [ SQSQueue, Arn ]
+
+resources:
+  Resources:
+    SQSQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: sqs-queue-${opt:stage, self:provider.stage}-send-email.fifo
+        FifoQueue: true
+        ContentBasedDeduplication: true
+
+functions:
+  generateTicket:
+    handler: functions/generateTicket.handler
+    events:
+      - http:
+          path: generateTicket
+          method: get
+    environment:
+       AWS_QUEUE_URL: { Ref: SQSQueue }
+
+  sendEmail:
+    handler: functions/sendEmail.handler
+    events:
+      - schedule: rate(5 minutes)
+    environment:
+       AWS_QUEUE_URL: { Ref: SQSQueue }
+
+plugins:
+  - serverless-offline
+  - serverless-offline-scheduler
